@@ -1,9 +1,7 @@
-import Html exposing (Html)
+import Html exposing (Html, ul, li, text)
 import Html.App as App
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
-import Time exposing (Time, second)
 
+import Ports as Ports
 
 
 main =
@@ -17,49 +15,44 @@ main =
 
 -- MODEL
 
-type alias Model = Time
+type alias Model = List String
 
 
 init : (Model, Cmd Msg)
 init =
-  (0, Cmd.none)
+  ([], Cmd.none)
 
 
 -- UPDATE
 
 type Msg
-  = Tick Time
-
+  = KeyDownEvent Int
+  | KeyPressEvent Int
+  | KeyUpEvent Int
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
-    Tick newTime ->
-      (newTime, Cmd.none)
+    KeyDownEvent evt ->
+      (("Down: " ++ toString(evt)) :: model, Cmd.none)
+    KeyPressEvent evt ->
+      (("Press: " ++ toString(evt)) :: model, Cmd.none)
+    KeyUpEvent evt ->
+      (("Up: " ++ toString(evt)) :: model, Cmd.none)
 
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every second Tick
+  [ Ports.keyDownEvents KeyDownEvent
+  , Ports.keyPressEvents KeyPressEvent
+  , Ports.keyUpEvents KeyUpEvent
+  ] |> Sub.batch
 
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-  let
-    angle =
-      turns (Time.inMinutes model)
-
-    handX =
-      toString (50 + 40 * cos angle)
-
-    handY =
-      toString (50 + 40 * sin angle)
-  in
-    svg [ viewBox "0 0 100 100", width "300px" ]
-      [ circle [ cx "50", cy "50", r "45", fill "#0B79CE" ] []
-      , line [ x1 "50", y1 "50", x2 handX, y2 handY, stroke "#023963" ] []
-      ]
+  ul [] (List.map (\str -> li [] [text str]) model)

@@ -11,6 +11,28 @@
 	<script>
 	    var node = document.getElementById('app-div');
 	    var app = Elm.Main.embed(node);
+
+	    document.addEventListener(
+	    	'keydown',
+	    	function (evt) {
+	    		app.ports.keyDownEvents.send(evt.keyCode);
+	    	},
+	    	false);
+
+	    document.addEventListener(
+	    	'keypress',
+	    	function (evt) {
+	    		app.ports.keyPressEvents.send(evt.keyCode);
+	    	},
+	    	false);
+
+	    document.addEventListener(
+	    	'keyup',
+	    	function (evt) {
+	    		app.ports.keyUpEvents.send(evt.keyCode);
+	    	},
+	    	false);
+
 	</script>
 </body>
 </html>
